@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./styles/OrderModal.module.css";
 
 function OrderModal({ order, setOrderModal }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const navigate = useNavigate();
 
   const placeOrder = async () => {
     const response = await fetch("/api/orders", {
@@ -19,8 +21,15 @@ function OrderModal({ order, setOrderModal }) {
         items: order
       })
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to create order");
+    }
+
     const data = await response.json();
-    console.log(data);
+    const orderId = data.id;
+    setOrderModal(false);
+    navigate.push(`/order-confirmation/${orderId}`);
   };
   return (
     <>
