@@ -63,3 +63,18 @@
   background-color: var(--secondary-accent);
   color: var(--secondary-color);
 }
+
+.errorMessages {
+  background-color: #ffdddd;
+  border-left: 6px solid #f44336;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.errorMessage {
+  color: #d8000c;
+  font-size: 14px;
+  margin: 0;
+  padding: 5px 0;
+}
