@@ -6,9 +6,44 @@ function OrderModal({ order, setOrderModal }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
 
+  const validateFields = () => {
+    const newErrors = [];
+
+    if (!name) {
+      newErrors.push("Name is required!");
+    }
+    if (!phone) {
+      newErrors.push("Phone number is required!");
+    } else if (!/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(phone)) {
+      newErrors.push("Phone number is invalid!");
+    }
+    if (!address) {
+      newErrors.push("Address is required!");
+    }
+
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
+
+  const formatPhoneNumber = (enteredPhone) => {
+    const cleaned = `${enteredPhone}`.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    return enteredPhone;
+  };
+
   const placeOrder = async () => {
+    if (!validateFields()) {
+      return;
+    }
+
+    const formattedPhone = formatPhoneNumber(phone);
+
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
@@ -16,7 +51,7 @@ function OrderModal({ order, setOrderModal }) {
       },
       body: JSON.stringify({
         name,
-        phone,
+        phone: formattedPhone,
         address,
         items: order
       })
@@ -47,6 +82,13 @@ function OrderModal({ order, setOrderModal }) {
       />
       <div className={styles.orderModalContent}>
         <h2>Place Order</h2>
+        {errors.length > 0 && (
+          <div className={styles.errorMessages}>
+            {errors.map((error) => (
+              <p className={styles.errorMessage}>{error}</p>
+            ))}
+          </div>
+        )}
         <form className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="name">
